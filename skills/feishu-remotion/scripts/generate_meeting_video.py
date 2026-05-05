@@ -155,7 +155,7 @@ def main():
 
 
 def query_schedule(date):
-    cmd = ['lark-cli', 'calendar', '+agenda', 
+    cmd = ['lark-cli', 'calendar', '+agenda',
            '--date', date, '--format', 'json']
     
     result = subprocess.run(cmd, capture_output=True, text=True)

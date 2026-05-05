@@ -19,11 +19,11 @@ lark-cli auth logout
 ## 会议相关 (VC)
 
 ```bash
-# 获取会议录制
-lark-cli vc +recording --meeting-id "123456789" --format json
+# 获取会议录制（支持批量，逗号分隔）
+lark-cli vc +recording --meeting-ids "123456789" --format json
 
-# 获取会议笔记
-lark-cli vc +notes --meeting-id "123456789" --format json
+# 获取会议笔记（支持批量）
+lark-cli vc +notes --meeting-ids "123456789" --format json
 
 # 搜索会议
 lark-cli vc +search --query "产品周会" --format json
@@ -45,14 +45,13 @@ lark-cli calendar +create-event --summary "会议" --start "2024-01-15T10:00:00"
 ## 妙记相关 (Minutes)
 
 ```bash
-# 搜索妙记
+# 搜索妙记（需要用户授权）
 lark-cli minutes +search --query "产品周会" --format json
 
-# 下载妙记
-lark-cli minutes +download --minutes-id "min_456" --output ./output
+# 下载妙记音频/视频
+lark-cli minutes +download --minute-tokens "token_abc" --output-dir ./output
 
-# 获取妙记详情
-lark-cli minutes +detail --minutes-id "min_456" --format json
+# 注意：minutes 没有 +detail 子命令，详情通过 +search 获取
 ```
 
 ## API 原始调用
@@ -64,6 +63,16 @@ lark-cli api GET /open-apis/calendar/v4/calendars/primary/events
 # POST 请求
 lark-cli api POST /open-apis/im/v1/messages \
   --body '{"receive_id":"user_123","msg_type":"text","content":"{\"text\":\"hello\"}"}'
+```
+
+## 身份类型
+
+```bash
+# 以用户身份执行（访问个人会议/妙记需要）
+lark-cli vc +search --query "产品周会" --as user
+
+# 以 Bot 身份执行（默认）
+lark-cli vc +search --query "产品周会" --as bot
 ```
 
 ## 输出格式
@@ -78,3 +87,8 @@ lark-cli calendar +agenda --format table
 #  pretty 格式
 lark-cli calendar +agenda --format pretty
 ```
+
+## 已知限制
+
+- `vc +recording` / `vc +notes` / `minutes +search` 需要 **用户授权**（`--as user`），Bot 身份无法访问
+- 若遇到 `need_user_authorization` 错误，请使用 `lark-cli auth login --recommend` 以用户身份登录

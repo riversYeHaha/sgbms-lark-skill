@@ -11,8 +11,8 @@ from pathlib import Path
 def get_meeting_by_link(meeting_link):
     meeting_id = extract_meeting_id(meeting_link)
     
-    cmd = ['lark-cli', 'vc', '+detail', 
-           '--meeting-id', meeting_id, 
+    cmd = ['lark-cli', 'vc', '+search',
+           '--query', meeting_id,
            '--format', 'json']
     
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -31,15 +31,22 @@ def get_meeting_by_link(meeting_link):
     
     data = json.loads(result.stdout)
     
+    # vc +search returns a list of meetings
+    meetings = data.get('meetings', []) if isinstance(data, dict) else []
+    if meetings:
+        meeting = meetings[0]
+    else:
+        meeting = {}
+    
     return {
         'meeting_id': meeting_id,
-        'topic': data.get('topic', '未知会议'),
-        'start_time': data.get('start_time', ''),
-        'end_time': data.get('end_time', ''),
-        'organizer': data.get('organizer', ''),
-        'participants': data.get('participants', []),
-        'has_recording': data.get('has_recording', False),
-        'has_minutes': data.get('has_minutes', False)
+        'topic': meeting.get('topic', '未知会议'),
+        'start_time': meeting.get('start_time', ''),
+        'end_time': meeting.get('end_time', ''),
+        'organizer': meeting.get('organizer', ''),
+        'participants': meeting.get('participants', []),
+        'has_recording': meeting.get('has_recording', False),
+        'has_minutes': meeting.get('has_minutes', False)
     }
 
 

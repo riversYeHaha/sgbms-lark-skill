@@ -73,13 +73,17 @@ def download_meeting_video(meeting_id, tmp_dir=None):
         return None
     
     cmd = ['lark-cli', 'vc', '+recording',
-           '--meeting-id', meeting_id,
-           '--output', str(video_path)]
+           '--meeting-ids', meeting_id,
+           '--output-dir', str(tmp_dir)]
     
     result = subprocess.run(cmd, capture_output=True, text=True)
     
-    if result.returncode == 0 and video_path.exists():
-        return str(video_path)
+    if result.returncode == 0:
+        # vc +recording may place files in subdirectories; find the mp4
+        for root, dirs, files in os.walk(tmp_dir):
+            for f in files:
+                if f.endswith('.mp4'):
+                    return str(Path(root) / f)
     
     return None
 

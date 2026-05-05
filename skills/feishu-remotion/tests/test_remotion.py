@@ -47,13 +47,15 @@ class TestGetMeetingInfo(unittest.TestCase):
     @patch('get_meeting_info.subprocess.run')
     def test_get_meeting_by_link_success(self, mock_run):
         mock_run.return_value = MagicMock(returncode=0, stdout=json.dumps({
-            'topic': '产品周会',
-            'start_time': '2026-01-15T10:00:00+08:00',
-            'end_time': '2026-01-15T11:00:00+08:00',
-            'organizer': '张三',
-            'participants': ['李四', '王五'],
-            'has_recording': True,
-            'has_minutes': True
+            'meetings': [{
+                'topic': '产品周会',
+                'start_time': '2026-01-15T10:00:00+08:00',
+                'end_time': '2026-01-15T11:00:00+08:00',
+                'organizer': '张三',
+                'participants': ['李四', '王五'],
+                'has_recording': True,
+                'has_minutes': True
+            }]
         }))
         result = get_meeting_by_link('https://vc.feishu.cn/j/123456789')
         self.assertEqual(result['meeting_id'], '123456789')
@@ -222,7 +224,7 @@ class TestCaptureScreenshots(unittest.TestCase):
     @patch('capture_screenshots.download_meeting_video')
     def test_capture_screenshots_no_video(self, mock_download):
         mock_download.return_value = None
-        script = {'scenes': [{'type': 'screenshot', 'screenshot': {'needed': True}}]}
+        script = {'scenes': [{'scene_id': 1, 'type': 'screenshot', 'screenshot': {'needed': True}}]}
         result = capture_screenshots('123', script, '/tmp/test')
         self.assertEqual(result, [])
 
@@ -381,7 +383,7 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(script['metadata']['style'], 'quick')
 
     def test_capture_screenshots_no_screenshot_scenes(self):
-        script = {'scenes': [{'type': 'title'}, {'type': 'ending'}]}
+        script = {'scenes': [{'scene_id': 1, 'type': 'title'}, {'scene_id': 2, 'type': 'ending'}]}
         result = capture_screenshots('123', script, '/tmp/test')
         self.assertEqual(result, [])
 
