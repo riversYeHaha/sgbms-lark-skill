@@ -5,6 +5,8 @@ __all__ = [
     "event_listener",
     "message_handler",
     "pet_daemon",
+    "pet_display",
+    "desktop_pet_app",
     "prepare_pet_run",
     "generate_pet_images",
     "record_imagegen_result",
