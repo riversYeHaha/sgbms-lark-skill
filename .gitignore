@@ -1,0 +1,59 @@
+# macOS metadata files
+.DS_Store
+._*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+.eggs/
+.pytest_cache/
+.tox/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Configuration files
+*.yaml
+*.yml
+!config.example.yaml
+!config.example.yml
+!agents/*.yaml
+!agents/*.yml
+
+# State files
+*.json
+!evals/*.json
+
+# Log files
+*.log
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# Image generation output
+pet-run*/
+generated/
+frames/
+final/
+qa/
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+
+# Secrets
+.env
+.secrets/

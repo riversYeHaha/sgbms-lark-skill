@@ -1,0 +1,62 @@
+pet:
+  name: "小 Lark"
+  personality: "活泼、乐于助人、技术专家"
+
+llm:
+  provider: deepseek
+  model: deepseek-chat
+  api_key: ${DEEPSEEK_API_KEY}
+  temperature: 0.7
+  max_tokens: 2000
+
+feishu:
+  app_id: ${FEISHU_APP_ID}
+  app_secret: ${FEISHU_APP_SECRET}
+  event_types:
+    - im.message.receive_v1
+
+image_generation:
+  # 火山引擎: doubao-seedream-5-0-260128, env: ARK_API_KEY
+  # 万相(阿里云百炼): wan2.7-image-pro / wan2.7-image, env: DASHSCOPE_API_KEY
+  provider: "volcengine"
+  model: "doubao-seedream-5-0-260128"
+  api_key: ${ARK_API_KEY}
+  size: "2K"
+  sequential_image_generation: "disabled"
+  response_format: "url"
+  watermark: true
+  atlas:
+    columns: 8
+    rows: 9
+    cell_width: 192
+    cell_height: 208
+  chroma_key: "#00FF00"
+  chroma_threshold: 30
+  animation:
+    idle: [280, 110, 110, 140, 140, 320]
+    running-right: [120, 120, 120, 120, 120, 120, 120, 220]
+    running-left: [120, 120, 120, 120, 120, 120, 120, 220]
+    waving: [140, 140, 140, 280]
+    jumping: [140, 140, 140, 140, 280]
+    failed: [140, 140, 140, 140, 140, 140, 140, 240]
+    waiting: [150, 150, 150, 150, 150, 260]
+    running: [120, 120, 120, 120, 120, 220]
+    review: [150, 150, 150, 150, 150, 280]
+
+behavior:
+  auto_reply: true
+  reply_delay: 1
+  context_window: 10
+
+mood:
+  enabled: true
+  update_interval: 60
+  mapping:
+    online: "idle:0"
+    happy: "idle:1"
+    busy: "waiting:0"
+    away: "idle:5"
+    sad: "failed:0"
+    thinking: "review:0"
+
+state_file: "./pet-state.json"
