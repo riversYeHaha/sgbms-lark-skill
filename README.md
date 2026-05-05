@@ -23,6 +23,7 @@ python skills/feishu-remotion/scripts/generate_meeting_video.py \
 - ✅ 多场景模板支持（标题、演讲者、内容、截图、结尾）
 
 **效果演示**：[docs/meeting-summary.mp4](./docs/meeting-summary.mp4)（功能验证，视频节奏偏快，具体效果仍需打磨调整）
+
 https://github.com/user-attachments/assets/2430dc55-bbc9-4cd2-b708-ddb8f2a6318f
 
 **技术栈**：
