@@ -8,32 +8,17 @@ import sys
 from pathlib import Path
 
 
-def render_video(script, screenshots_dir, output_path, project_dir=None):
-    if project_dir is None:
-        project_dir = Path('./tmp/remotion-project')
-    else:
-        project_dir = Path(project_dir)
-    
-    project_dir = create_remotion_project(script, screenshots_dir, project_dir)
-    
-    # Install dependencies if not already present
-    node_modules = project_dir / 'node_modules'
-    if not node_modules.exists():
-        print("  正在安装 Remotion 依赖...")
-        install_cmd = ['npm', 'install', '--prefer-offline']
-        result = subprocess.run(install_cmd, cwd=project_dir, capture_output=True, text=True)
-        if result.returncode != 0:
-            print(f"  npm install 失败: {result.stderr}", file=sys.stderr)
+def render_video(script, screenshots_dir, output_path):
+    project_dir = create_remotion_project(script, screenshots_dir)
     
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     cmd = [
-        'npx', '@remotion/cli', 'render',
-        'src/index.tsx',
+        'npx', 'remotion', 'render',
+        str(project_dir / 'src' / 'index.tsx'),
         'MeetingSummary',
-        str(output_path),
-        '--log', 'error'
+        str(output_path)
     ]
     
     env = os.environ.copy()
@@ -54,9 +39,8 @@ def render_video(script, screenshots_dir, output_path, project_dir=None):
     return True
 
 
-def create_remotion_project(script, screenshots_dir, project_dir=None):
-    if project_dir is None:
-        project_dir = Path('./tmp/remotion-project')
+def create_remotion_project(script, screenshots_dir):
+    project_dir = Path('./tmp/remotion-project')
     project_dir.mkdir(parents=True, exist_ok=True)
     
     create_package_json(project_dir)
@@ -474,7 +458,7 @@ export const MeetingSummary: React.FC<MeetingSummaryProps> = ({{ script }}) => {
 
 
 def _ts_escape(text):
-    return text.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'").replace('\n', ' ')
+    return text.replace('\\', '\\\\').replace("'", "\\'").replace('\n', ' ')
 
 
 def main():
@@ -492,8 +476,7 @@ def main():
     success = render_video(
         script=script,
         screenshots_dir=args.screenshots,
-        output_path=args.output,
-        project_dir=args.project_dir
+        output_path=args.output
     )
 
     if success:

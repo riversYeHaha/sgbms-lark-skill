@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+"""获取飞书会议信息 — 通过会议链接查询会议详情"""
+import argparse
 import json
 import re
 import subprocess
+import sys
+from pathlib import Path
 
 
 def get_meeting_by_link(meeting_link):
@@ -53,3 +57,26 @@ def extract_meeting_id(link):
             return match.group(1)
     
     return link.split('/')[-1]
+
+
+def main():
+    parser = argparse.ArgumentParser(description='获取飞书会议信息')
+    parser.add_argument('--meeting-link', required=True, help='会议链接')
+    parser.add_argument('--output', '-o', help='输出文件路径 (JSON)')
+    
+    args = parser.parse_args()
+    
+    result = get_meeting_by_link(args.meeting_link)
+    
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+        print(f"会议信息已保存到: {args.output}")
+    else:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+if __name__ == '__main__':
+    main()

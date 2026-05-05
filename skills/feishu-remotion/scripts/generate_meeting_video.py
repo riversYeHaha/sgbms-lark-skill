@@ -20,6 +20,30 @@ from capture_screenshots import capture_screenshots
 from render_video import render_video
 
 
+def load_config(config_path):
+    try:
+        import yaml
+        with open(config_path, 'r', encoding='utf-8') as f:
+            raw = f.read()
+        for env_var, value in os.environ.items():
+            raw = raw.replace(f'${{{env_var}}}', value)
+        return yaml.safe_load(raw)
+    except FileNotFoundError:
+        return {}
+    except ImportError:
+        print("提示: 安装 pyyaml 以使用配置文件: pip install pyyaml")
+        return {}
+
+
+def merge_config(args, config):
+    if not config:
+        return
+    if not args.duration and config.get('video', {}).get('max_duration'):
+        args.duration = config['video']['max_duration']
+    ffmpeg_path = config.get('ffmpeg', {}).get('path', 'ffmpeg')
+    os.environ.setdefault('FFMPEG_PATH', ffmpeg_path)
+
+
 def main():
     parser = argparse.ArgumentParser(description='生成飞书会议总结视频')
     parser.add_argument('--meeting-link', help='会议链接')
@@ -28,14 +52,23 @@ def main():
     parser.add_argument('--style', default='summary', 
                        choices=['summary', 'detailed', 'quick'],
                        help='视频风格')
-    parser.add_argument('--duration', type=int, default=180,
-                       help='最大时长（秒）')
+    parser.add_argument('--duration', type=int, default=0,
+                       help='最大时长（秒），0=使用默认值')
+    parser.add_argument('--provider', default='deepseek',
+                       choices=['deepseek', 'kimi', 'glm', 'volcengine'],
+                       help='LLM 提供商')
     parser.add_argument('--config', default='./config.yaml',
                        help='配置文件路径')
     parser.add_argument('--skip-screenshots', action='store_true',
                        help='跳过截图步骤')
     
     args = parser.parse_args()
+    
+    config = load_config(args.config)
+    merge_config(args, config)
+    
+    if args.duration <= 0:
+        args.duration = 180
     
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -83,7 +116,8 @@ def main():
     script = generate_script(
         transcript=minutes,
         style=args.style,
-        max_duration=args.duration
+        max_duration=args.duration,
+        provider=args.provider
     )
     
     with open(tmp_dir / 'script.json', 'w', encoding='utf-8') as f:

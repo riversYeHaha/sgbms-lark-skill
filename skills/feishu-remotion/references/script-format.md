@@ -13,7 +13,7 @@
     "title": "产品周会总结",
     "meeting_id": "123456789",
     "meeting_topic": "产品周会",
-    "meeting_date": "2024-01-15",
+    "meeting_date": "2026-01-15",
     "duration_seconds": 180,
     "style": "summary",
     "total_scenes": 5
@@ -23,8 +23,8 @@
       "scene_id": 1,
       "type": "title",
       "title": "产品周会 - Q1 规划",
-      "subtitle": "2024年1月15日",
-      "duration": 3,
+      "subtitle": "2026年1月15日",
+      "duration": 50,
       "transition": "fade_in",
       "visual": {
         "type": "title_card",
@@ -41,7 +41,7 @@
         "性能提升",
         "用户体验改进"
       ],
-      "duration": 8,
+      "duration": 60,
       "transition": "slide_in",
       "visual": {
         "type": "bullet_points",
@@ -59,7 +59,7 @@
         "path": "./screenshots/screenshot_001.jpg",
         "caption": "系统架构图"
       },
-      "duration": 6,
+      "duration": 45,
       "transition": "fade_in",
       "visual": {
         "type": "image_show",
@@ -84,7 +84,7 @@
       "scene_id": 5,
       "type": "ending",
       "content": "感谢参与，下周见！",
-      "duration": 3,
+      "duration": 20,
       "transition": "fade_out",
       "visual": {
         "type": "ending_card",
@@ -165,11 +165,11 @@
   "style": "summary",
   "duration_seconds": 180,
   "scenes": [
-    { "type": "title", "duration": 3 },
-    { "type": "content", "duration": 8 },
-    { "type": "screenshot", "duration": 6 },
-    { "type": "content", "duration": 8 },
-    { "type": "ending", "duration": 3 }
+  { "type": "title", "duration": 5 },
+  { "type": "content", "duration": 60 },
+  { "type": "screenshot", "duration": 45 },
+  { "type": "content", "duration": 50 },
+  { "type": "ending", "duration": 20 }
   ]
 }
 ```

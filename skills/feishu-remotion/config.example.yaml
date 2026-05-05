@@ -1,0 +1,27 @@
+# feishu-remotion 配置模板
+# 复制此文件为 config.yaml 并填入实际值
+
+feishu:
+  app_id: ${FEISHU_APP_ID}
+  app_secret: ${FEISHU_APP_SECRET}
+
+llm:
+  provider: deepseek
+  model: deepseek-chat
+  api_key: ${DEEPSEEK_API_KEY}
+  temperature: 0.7
+
+remotion:
+  fps: 30
+  width: 1920
+  height: 1080
+  default_duration: 180
+
+video:
+  default_style: "summary"
+  max_duration: 300
+  screenshot_quality: 2
+
+ffmpeg:
+  path: "ffmpeg"
+  screenshot_format: "jpg"

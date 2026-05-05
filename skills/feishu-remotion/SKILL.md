@@ -79,13 +79,15 @@ python scripts/get_meeting_info.py \
 # Step 2: 获取妙记和逐字稿
 python scripts/get_meeting_minutes.py \
   --meeting-id "123456789" \
-  --output ./tmp/transcript.txt
+  --output ./tmp/transcript.json
 
 # Step 3: 生成精炼脚本
 python scripts/generate_script.py \
-  --transcript ./tmp/transcript.txt \
+  --transcript ./tmp/transcript.json \
   --output ./tmp/script.json \
-  --style "summary"
+  --style "summary" \
+  --max-duration 180 \
+  --provider deepseek
 
 # Step 4: 下载妙记视频并截图（如需要）
 python scripts/capture_screenshots.py \
@@ -131,8 +133,8 @@ python scripts/get_meeting_info.py --meeting-link "https://vc.feishu.cn/j/123456
 # 查询某天的日程
 lark-cli calendar +agenda --date "2024-01-15" --format json
 
-# 或查询某段时间的会议
-python scripts/get_schedule.py --date "2024-01-15" --output ./tmp/schedule.json
+# 或通过主脚本的 --date 参数自动查询日程
+python scripts/generate_meeting_video.py --date "2026-01-15" --output-dir ./output
 ```
 
 输出格式：
@@ -194,7 +196,8 @@ python scripts/generate_script.py \
   --transcript ./tmp/transcript.json \
   --output ./tmp/script.json \
   --style "summary" \
-  --max-duration 180
+  --max-duration 180 \
+  --provider deepseek
 ```
 
 脚本格式：
@@ -253,18 +256,16 @@ python scripts/capture_screenshots.py \
 ### 阶段 5：Remotion 视频合成
 
 ```bash
-# 准备 Remotion 项目
-python scripts/prepare_remotion_project.py \
-  --script ./tmp/script.json \
-  --output-dir ./remotion-project
-
-# 渲染视频
+# 渲染视频（自动准备 Remotion 项目）
 python scripts/render_video.py \
-  --project-dir ./remotion-project \
+  --script ./tmp/script.json \
+  --screenshots ./tmp/screenshots \
   --output ./output/meeting-summary.mp4
 ```
 
 ## Remotion 项目结构
+
+> 以下结构由 `render_video.py` 动态生成，组件文件自动创建。
 
 ```
 remotion-project/
@@ -272,14 +273,7 @@ remotion-project/
 │   ├── index.tsx           # 入口文件
 │   ├── Root.tsx            # Composition 注册
 │   ├── compositions/
-│   │   ├── MeetingSummary.tsx    # 主视频组件
-│   │   ├── TitleScene.tsx        # 标题场景
-│   │   ├── ContentScene.tsx      # 内容场景
-│   │   └── ScreenshotScene.tsx   # 截图场景
-│   ├── components/
-│   │   ├── Typewriter.tsx        # 打字机效果
-│   │   ├── FadeIn.tsx            # 淡入效果
-│   │   └── BulletPoints.tsx      # 要点展示
+│   │   └── MeetingSummary.tsx    # 主视频组件（含所有场景类型）
 │   └── data/
 │       └── script.json           # 脚本数据
 ├── public/
@@ -287,6 +281,8 @@ remotion-project/
 ├── package.json
 └── tsconfig.json
 ```
+
+支持的场景类型：`title`（标题卡）、`content`（要点展示）、`screenshot`（截图展示）、`speaker`（发言人卡片）、`ending`（结束画面）。
 
 ## Composition 配置
 
@@ -368,7 +364,7 @@ ffmpeg:
 
 ```bash
 # Python 依赖
-pip install pyyaml requests openai
+pip install pyyaml requests pillow openai
 
 # Node.js 依赖（用于 Remotion）
 npm install remotion @remotion/cli @remotion/player
