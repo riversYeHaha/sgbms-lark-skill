@@ -146,7 +146,7 @@ def generate_script(transcript, style='summary', max_duration=180, provider='dee
 
 
 def create_default_script(transcript, style, max_duration):
-    title = transcript.get('summary', '会议总结')[:20]
+    title = transcript.get('summary', '')[:20] or '会议总结'
     
     scenes = [
         {

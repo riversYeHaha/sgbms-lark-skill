@@ -28,8 +28,10 @@ def render_video(script, screenshots_dir, output_path, project_dir=None):
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
+    cli_path = str(project_dir / 'node_modules' / '@remotion' / 'cli' / 'remotion-cli.js')
     cmd = [
-        'npx', '@remotion/cli', 'render',
+        'node', cli_path,
+        'render',
         'src/index.tsx',
         'MeetingSummary',
         str(output_path),
@@ -57,6 +59,8 @@ def render_video(script, screenshots_dir, output_path, project_dir=None):
 def create_remotion_project(script, screenshots_dir, project_dir=None):
     if project_dir is None:
         project_dir = Path('./tmp/remotion-project')
+    else:
+        project_dir = Path(project_dir)
     project_dir.mkdir(parents=True, exist_ok=True)
     
     create_package_json(project_dir)
@@ -142,7 +146,7 @@ export const RemotionRoot: React.FC = () => {{
     <Composition
       id="MeetingSummary"
       component={{MeetingSummary}}
-      durationInFrames={duration_frames}
+      durationInFrames={{{duration_frames}}}
       fps={{30}}
       width={{1920}}
       height={{1080}}
