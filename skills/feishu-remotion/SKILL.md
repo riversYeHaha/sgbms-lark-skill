@@ -102,6 +102,58 @@ python scripts/render_video.py \
   --output ./output/meeting-summary.mp4
 ```
 
+### 4. 真实使用示例
+
+以会议 `https://vc.feishu.cn/j/206594528` 为例：
+
+```bash
+# 1. 获取会议信息
+python scripts/get_meeting_info.py \
+  --meeting-link "https://vc.feishu.cn/j/206594528" \
+  --output ./tmp/meeting.json
+
+# 输出:
+# {
+#   "meeting_id": "206594528",
+#   "topic": "2050新生论坛线上返场 WaytoAGI分享会",
+#   "start_time": "2026-05-05T20:00:00+08:00",
+#   "end_time": "2026-05-05T22:00:00+08:00",
+#   "organizer": "🌈AJ",
+#   "has_recording": true,
+#   "has_minutes": true
+# }
+
+# 2. 获取逐字稿（实际通过飞书 docx API 读取）
+# 脚本会自动调用 vc +notes 获取 verbatim_doc_token，
+# 然后通过 docx API 读取完整逐字稿内容
+python scripts/get_meeting_minutes.py \
+  --meeting-id "206594528" \
+  --output ./tmp/transcript.json
+
+# 3. 生成视频脚本（使用 DeepSeek LLM）
+python scripts/generate_script.py \
+  --transcript ./tmp/transcript.json \
+  --output ./tmp/script.json \
+  --style "summary" \
+  --provider deepseek
+
+# 4. 生成视频（跳过截图，因为录制需要组织者权限）
+python scripts/generate_meeting_video.py \
+  --meeting-link "https://vc.feishu.cn/j/206594528" \
+  --output-dir ./output \
+  --style "summary" \
+  --skip-screenshots
+```
+
+**实际测试数据：**
+- 会议时长：2小时13分钟（19:55 - 22:08）
+- 参会人数：363人
+- 逐字稿：389行，含时间戳和发言人标记
+- 智能纪要：76行结构化摘要，包含5个主题（AI安全、AI设计、AI创业、OPC实践、投资）
+- 录制视频：❌ 需要组织者权限（HTTP 403）
+- 逐字稿：✅ 成功获取
+- 智能纪要：✅ 成功获取
+
 ## 详细流程
 
 ### 阶段 1：获取会议信息
@@ -375,24 +427,47 @@ npm install remotion @remotion/cli @remotion/player
 ### 完整命令
 
 ```bash
+# 基础用法：通过会议链接生成视频
 python scripts/generate_meeting_video.py \
   --meeting-link "https://vc.feishu.cn/j/123456789" \
   --output-dir ./output \
   --style "summary" \
   --duration 180 \
   --config ./config.yaml
+
+# 通过日程查询生成视频
+python scripts/generate_meeting_video.py \
+  --date "2026-05-05" \
+  --output-dir ./output \
+  --style "summary"
+
+# 快速生成（跳过截图，纯文字）
+python scripts/generate_meeting_video.py \
+  --meeting-link "https://vc.feishu.cn/j/206594528" \
+  --output-dir ./output \
+  --style "quick" \
+  --skip-screenshots
+
+# 详细风格（包含所有发言人观点）
+python scripts/generate_meeting_video.py \
+  --meeting-link "https://vc.feishu.cn/j/206594528" \
+  --output-dir ./output \
+  --style "detailed" \
+  --duration 600
 ```
 
 ### 参数说明
 
 | 参数 | 说明 | 默认值 |
 |------|------|--------|
-| `--meeting-link` | 会议链接 | - |
-| `--date` | 查询日程日期 | - |
+| `--meeting-link` | 会议链接（如 https://vc.feishu.cn/j/123456789） | - |
+| `--date` | 查询日程日期（YYYY-MM-DD） | - |
 | `--output-dir` | 输出目录 | `./output` |
-| `--style` | 视频风格 | `summary` |
-| `--duration` | 最大时长（秒） | 180 |
+| `--style` | 视频风格：`summary`/`detailed`/`quick` | `summary` |
+| `--duration` | 最大时长（秒），0=使用默认值 | 180 |
+| `--provider` | LLM 提供商：`deepseek`/`kimi`/`glm`/`volcengine` | `deepseek` |
 | `--config` | 配置文件路径 | `./config.yaml` |
+| `--skip-screenshots` | 跳过截图步骤 | false |
 
 ## 参考资料
 

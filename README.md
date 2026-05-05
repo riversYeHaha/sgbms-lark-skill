@@ -22,6 +22,8 @@ python skills/feishu-remotion/scripts/generate_meeting_video.py \
 - ✅ Remotion 视频渲染
 - ✅ 多场景模板支持（标题、演讲者、内容、截图、结尾）
 
+**效果演示**：[docs/meeting-summary.mp4](./docs/meeting-summary.mp4)（功能验证，视频节奏偏快，具体效果仍需打磨调整）
+
 **技术栈**：
 - Python 3.8+
 - Remotion (Node.js 18+)

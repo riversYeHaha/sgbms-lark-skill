@@ -54,6 +54,9 @@ qa/
 # OS files
 Thumbs.db
 
+# Test directories
+skills/feishu-remotion/tests/
+
 # Secrets
 .env
 .secrets/
